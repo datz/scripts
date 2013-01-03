@@ -1,0 +1,5 @@
+#!/bin/bash
+
+win_id=$(xprop -root | sed '/_NET_ACTIVE_WINDOW(WINDOW)/ {s/.*\(0x[a-z0-9]\+\)/\1/;q} ; d')
+
+import -window $win_id ~/Desktop/screenshots/`date '+%Y-%m-%d_%H-%M-%S'`.png
