@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Can get from wmctrl -d
-S_W=3840
-S_H=1080
+S_W=$S_W
+S_H=$S_H
 
 # Get info of current active window
 
@@ -18,22 +18,20 @@ read b_left a_ b_top b_ <<< "$(xprop -id $win_id | sed '/FRAME.*CARDINAL/ {s/[_=
 
 case "$1" in
 	u|up)
-		((win_y-=S_H))
-		((win_y < 0)) && exit 1
+		NEW_WIN_X=$win_x
+		NEW_WIN_Y=$(($win_y+$S_H))
 		;;
 	d|down)
-		((win_y+=S_H))
-		((win_y >= 2*S_H)) && exit 1
+		NEW_WIN_X=$win_x
+		NEW_WIN_Y=$(($win_y-$S_H))
 		;;
 	l|left)
-		NEW_WIN_X=$(($win_x-1920))
-		#((win_x-=S_W))
-		#((win_x < 0)) && exit 1
+		NEW_WIN_X=$(($win_x-$S_W))
+		NEW_WIN_Y=$win_y
 		;;
 	r|right)
-		NEW_WIN_X=$(($win_x+1920))
-		#((win_x+=S_W))
-		#((win_x >= 2*S_W)) && exit 1
+		NEW_WIN_X=$(($win_x+$S_W))
+		NEW_WIN_Y=$win_y
 		;;
 	*)
 		exit 1
@@ -41,4 +39,4 @@ case "$1" in
 esac
 
 # Somehow, the window gets taller in Fluxbox after moves, has to supply height instead of -1
-wmctrl -i -r $win_id -e "1,$NEW_WIN_X,$win_y,$win_w,$win_h"
+wmctrl -i -r $win_id -e "1,$NEW_WIN_X,$NEW_WIN_Y,$win_w,$win_h"
