@@ -1,0 +1,26 @@
+#!/bin/zsh
+
+while true; do
+    KEYBOARD_SLAVE=$(xinput list | grep 'Set 2 keyboard' | egrep -o 'id=..?' | sed 's/id=//g')
+    KEYBOARD_MASTER=$(xinput list | grep 'Set 2 keyboard' | egrep -o '\(..?\)' | egrep -o '[0-9]+')
+    KEYBOARD_FLOATING=$(xinput list | grep 'Set 2 keyboard' | grep -o floating)
+    USB_KEYBOARD=$(xinput list | grep 'USB Keyboard' | egrep 'slave *keyboard' | egrep -o 'id=..?' | sed 's/id=//g')
+    FILE_MASTER=/tmp/kbdmaster
+
+    if [ $USB_KEYBOARD ]; then
+	echo encontré usb $USB_KEYBOARD
+	echo desactivar $KEYBOARD_SLAVE de $KEYBOARD_MASTER
+	echo $KEYBOARD_MASTER > $FILE_MASTER
+	xinput float $KEYBOARD_SLAVE
+	xmodmap ~/.Xmodmap
+    else
+	echo no encontré usb
+	if [ $KEYBOARD_FLOATING ]; then
+            echo  reactivar $KEYBOARD_ID
+            xinput reattach $KEYBOARD_SLAVE `cat $FILE_MASTER`
+            rm $FILE_MASTER
+	fi
+    fi
+
+    sleep 2
+done
