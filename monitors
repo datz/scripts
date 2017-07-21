@@ -1,0 +1,59 @@
+#!/bin/bash
+
+wpdir=$HOME/Images/wallpapers
+
+formatOrientation () {
+    if [ `echo $1 | cut -c -2` = '--' ]; then
+        echo $1
+    else
+        echo --$1
+    fi
+}
+
+case $1 in
+    r)
+        orientation=--rigth-of
+        ;;
+    l)
+        orientation=--left-of
+        ;;
+    b)
+        orientation=--below
+        ;;
+    a)
+        orientation=--above
+        ;;
+    *)
+        orientation=`formatOrientation $1`
+esac
+
+checkConnections() {
+    xrandr | grep connected | grep -v disconnected | awk '{print $1}'
+}
+
+getPrimaryMonitor() {
+    xrandr | grep primary | awk '{print $1}'
+}
+
+getMaxResolution() {
+    xrandr | grep -A 1 $1 | tail -1 | awk '{print $1}'
+}
+
+isConnected(){
+    xrandr | grep -A 1 $1 | tail -1 | grep -c '*'
+}
+
+for i in `checkConnections`; do
+    if [ `isConnected $i` -eq 1 ]; then
+        echo $i connected
+        bestRes=`getMaxResolution $i`
+        xrandr --output $i --mode $bestRes $orientation `getPrimaryMonitor`
+        nitrogen --head=0 --set-auto $wpdir/`getMaxResolution $i`.png
+    else
+        bestRes=`getMaxResolution $i`
+        echo $i disconnected connecting to $bestRes $orientation of `getPrimaryMonitor`
+
+        xrandr --output $i --mode $bestRes $orientation `getPrimaryMonitor`
+        nitrogen --head=1 --set-auto $wpdir/`getMaxResolution $i`.png
+    fi
+done
