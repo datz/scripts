@@ -1,0 +1,19 @@
+#!/bin/bash
+
+host=aad;
+vpn_config_dir=~/vpn
+vpn_config=client.ovpn
+pid=`ps ax | grep openvpn | grep -v grep  | grep -v sudo | awk '{print $1}'`
+
+if [ $pid ]; then
+    echo vpn is running with PID $pid;
+    ping $host -c 2 &> /dev/null
+    if [ ! $? ]; then
+        echo but host $host is not respondig
+    fi
+else
+    echo starting vpn...
+    cd $vpn_config_dir/
+    sudo openvpn --config $vpn_config &
+    cd -
+fi

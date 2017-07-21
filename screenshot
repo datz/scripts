@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ ! -d ~/Desktop/screenshots ]] then
+   mkdir ~/Desktop/screenshots
+fi
+
 win_id=$(xwininfo -root | grep root | awk '{print $4}')
 
 import -window $win_id ~/Desktop/screenshots/`date '+%Y-%m-%d_%H-%M-%S'`.png

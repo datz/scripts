@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for i in *.xml; do
+#    echo ${i/.xml/}
+    egrep -oi  'Fecha Viaje: [^&]+' $i | egrep -o '[0-9][0-9: -]+' | tr -d '\n'
+    echo -n ,apps and devices,transporte,,
+    egrep -oi ' UUID="[^"]+"' $i | awk -F= '{print $2}' | egrep -o '[^"]+'| tr -d '\n'
+    echo -n ,
+    egrep -oi ' subtotal="[^"]+"' $i | awk -F= '{print $2}' | egrep -o '[^"]+'| tr -d '\n'
+    echo
+done
